@@ -2,3 +2,6 @@
 .superpowers/
 .swiftpm/
 .DS_Store
+npm/bin/
+npm/README.md
+npm/LICENSE

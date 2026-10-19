@@ -1,0 +1,15 @@
+{
+  "name": "earshot",
+  "version": "1.1.0",
+  "description": "Local voice and live dashboard for Claude Code sessions in your terminal tabs (macOS, Apple Silicon)",
+  "bin": { "earshot": "bin/earshot" },
+  "files": ["bin/earshot", "README.md", "LICENSE"],
+  "os": ["darwin"],
+  "cpu": ["arm64"],
+  "keywords": ["claude", "claude-code", "voice", "speech-to-text", "text-to-speech", "dashboard", "terminal", "macos"],
+  "homepage": "https://github.com/Xusniddin-devv/earshot",
+  "repository": { "type": "git", "url": "git+https://github.com/Xusniddin-devv/earshot.git" },
+  "bugs": "https://github.com/Xusniddin-devv/earshot/issues",
+  "license": "MIT",
+  "author": "Xusniddin Qalandarov"
+}
