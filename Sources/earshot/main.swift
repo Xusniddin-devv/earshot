@@ -49,6 +49,8 @@ case "uninstall":
     }
 case "doctor":
     runDoctor()
+case "debug-state":
+    runDebugState()
 case "set-key":
     runSetKey()
 case "selftest":

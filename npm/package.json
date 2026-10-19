@@ -1,6 +1,6 @@
 {
   "name": "@khusniddin/earshot",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Local voice and live dashboard for Claude Code sessions in your terminal tabs (macOS, Apple Silicon)",
   "bin": { "earshot": "bin/earshot" },
   "files": ["bin/earshot", "README.md", "LICENSE"],

@@ -100,10 +100,13 @@ final class App {
     func refreshTabs() {
         // Background jobs report a hidden pty; move them to the tab running their client first.
         let tree = SysctlProcessTree()
-        store.setTTYOverrides(SessionRegistry.ttyOverrides(SessionRegistry.load(dir: SessionRegistry.liveDir),
-                                                           process: { pid in
+        let registry = SessionRegistry.load(dir: SessionRegistry.liveDir)
+        let process: (Int32) -> SessionRegistry.Process? = { pid in
             tree.name(of: pid).map { SessionRegistry.Process(name: $0, tty: tree.tty(of: pid).map { "/dev/" + $0 }) }
-        }))
+        }
+        store.setTTYOverrides(SessionRegistry.ttyOverrides(registry, process: process))
+        // Sessions idle since before Earshot started have sent no hook event; the registry still lists them.
+        store.seed(SessionRegistry.visible(registry, process: process))
         let tabs = terminal.tabs()
         let failed = terminal.failedApps
         if let scan = TabScan.result(tabs: tabs, failedApps: failed, allFailed: terminal.lastError != nil,

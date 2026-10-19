@@ -34,6 +34,8 @@ public enum TabScan {
     public static func result(tabs: [TabRef], failedApps: [String], allFailed: Bool, claudeTTYs: Set<String>,
                               ownTTY: String?, oldTitles: [String: String]) -> Result? {
         if allFailed { return nil }
+        // No tabs at all while claude runs somewhere is a glitch, not "every tab closed": keep everything.
+        if tabs.isEmpty, failedApps.isEmpty, !claudeTTYs.isEmpty { return nil }
         let own: Set<String> = ownTTY.map { [$0] } ?? []
         let fresh = Dictionary(tabs.map { ($0.tty, $0.title) }, uniquingKeysWith: { a, _ in a })
         // A tab only counts if claude is actually running in it (TTY names get reused).

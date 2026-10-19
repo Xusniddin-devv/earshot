@@ -104,6 +104,16 @@ public final class SessionStore {
     }
 
     /// Drops sessions whose Terminal tab no longer exists.
+    /// Adds running sessions that have sent no hook event yet (idle since before Earshot started).
+    /// Hooks stay the source of truth: known sessions and tabs that already have a row are left alone.
+    public func seed(_ visible: [SessionRegistry.Visible], now: Date = Date()) {
+        for v in visible where !sessions.contains(where: { $0.id == v.sessionId || $0.tty == v.tty }) {
+            sessions.append(Session(id: v.sessionId, cwd: v.cwd, tty: v.tty, status: v.status, unread: false,
+                                    reply: nil, changedAt: now, hookTTY: v.tty))
+        }
+        sort()
+    }
+
     public func prune(liveTTYs: Set<String>) {
         sessions.removeAll { s in s.tty.map { !liveTTYs.contains($0) } ?? false }
     }

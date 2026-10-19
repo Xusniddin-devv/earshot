@@ -12,13 +12,34 @@ public enum SessionRegistry {
         public var kind: String?
         public var jobId: String?
         public var parkedJobId: String?
+        public var cwd: String?
+        /// `busy`, `waiting`, `idle`, `shell`…
+        public var status: String?
 
-        public init(pid: Int32, sessionId: String, kind: String?, jobId: String?, parkedJobId: String?) {
+        public init(pid: Int32, sessionId: String, kind: String?, jobId: String?, parkedJobId: String?,
+                    cwd: String? = nil, status: String? = nil) {
             self.pid = pid
             self.sessionId = sessionId
             self.kind = kind
             self.jobId = jobId
             self.parkedJobId = parkedJobId
+            self.cwd = cwd
+            self.status = status
+        }
+    }
+
+    /// A running session as seen on a tab, for sessions that have sent no hook event yet.
+    public struct Visible: Equatable, Sendable {
+        public var sessionId: String
+        public var cwd: String
+        public var tty: String
+        public var status: SessionStatus
+
+        public init(sessionId: String, cwd: String, tty: String, status: SessionStatus) {
+            self.sessionId = sessionId
+            self.cwd = cwd
+            self.tty = tty
+            self.status = status
         }
     }
 
@@ -45,7 +66,8 @@ public enum SessionRegistry {
               let sessionId = json["sessionId"] as? String, !sessionId.isEmpty
         else { return nil }
         return Entry(pid: pid, sessionId: sessionId, kind: json["kind"] as? String,
-                     jobId: json["jobId"] as? String, parkedJobId: json["parkedJobId"] as? String)
+                     jobId: json["jobId"] as? String, parkedJobId: json["parkedJobId"] as? String,
+                     cwd: json["cwd"] as? String, status: json["status"] as? String)
     }
 
     /// Reads every `*.json` in `dir`; a missing dir or unreadable file just yields fewer entries.
@@ -97,5 +119,24 @@ public enum SessionRegistry {
             }
         }
         return nil
+    }
+
+    /// One entry per live client tab: the client's own session, or the background job parked in it.
+    public static func visible(_ entries: [Entry], process: (Int32) -> Process?) -> [Visible] {
+        let jobs = Dictionary(entries.filter { $0.kind == "bg" }.compactMap { e in e.jobId.map { ($0, e) } },
+                              uniquingKeysWith: { a, _ in a })
+        return entries.filter { $0.kind != "bg" }.sorted { $0.pid < $1.pid }.compactMap { client in
+            guard let p = process(client.pid), p.name == "claude", let tty = p.tty else { return nil }
+            let shown = client.parkedJobId.flatMap { jobs[$0] } ?? client
+            return Visible(sessionId: shown.sessionId, cwd: shown.cwd ?? "", tty: tty, status: status(shown.status))
+        }
+    }
+
+    static func status(_ raw: String?) -> SessionStatus {
+        switch raw {
+        case "busy": .working
+        case "waiting": .waiting
+        default: .idle
+        }
     }
 }

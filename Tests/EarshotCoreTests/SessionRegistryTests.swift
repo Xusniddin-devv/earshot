@@ -16,7 +16,7 @@ private func entry(_ json: String) -> SessionRegistry.Entry? {
 @Test func parsesRegistryEntries() throws {
     let c = try #require(entry(client))
     #expect(c == SessionRegistry.Entry(pid: 41001, sessionId: "aaaa1111", kind: "interactive",
-                                       jobId: nil, parkedJobId: "bbbb2222"))
+                                       jobId: nil, parkedJobId: "bbbb2222", status: "idle"))
     let j = try #require(entry(job))
     #expect(j.kind == "bg" && j.jobId == "bbbb2222" && j.parkedJobId == nil && j.pid == 42002)
 }
