@@ -57,7 +57,7 @@ ready — hold Right Option to talk
 Requires macOS 15+ on Apple Silicon and Claude Code.
 
 ```sh
-npm install -g earshot                      # prebuilt binary, no Xcode needed
+npm install -g @khusniddin/earshot          # prebuilt binary, no Xcode needed
 # or: brew install Xusniddin-devv/tap/earshot   (builds from source, needs Xcode 26)
 earshot          # first run offers to add the hooks, then opens the dashboard
 ```
@@ -163,7 +163,7 @@ hooks are async, so they never slow Claude down.
 
 ```sh
 earshot uninstall          # hooks (settings backed up first), event log, config
-npm uninstall -g earshot   # or: brew uninstall earshot / make uninstall
+npm uninstall -g @khusniddin/earshot   # or: brew uninstall earshot / make uninstall
 ```
 
 The models are shared with other FluidAudio apps, so Earshot leaves them. If
